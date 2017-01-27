@@ -1,6 +1,6 @@
 (ns apache-commons-matrix.core
   (:require [clojure.core.matrix.protocols :as mp]
-            [clojure.core.matrix.implementations :as imp])  
+            [clojure.core.matrix.implementations :as imp])
   (:import [org.apache.commons.math3.linear
             Array2DRowRealMatrix RealMatrix
             ArrayRealVector RealVector
@@ -79,7 +79,7 @@
           (throw (ex-info "RealMatrix only has 2 dimensions"
                     {:requested-index indexes
                      :index-count (count indexes)}))))
-  
+
   RealVector
   (get-1d [v index] (.getEntry v index))
   (get-2d [v row column]
@@ -98,7 +98,7 @@
   (set-2d [m row column e] (mp/set-2d! (.copy m) row column e))
   (set-nd [m indexes e] (mp/set-nd! (.copy m) indexes e))
   (is-mutable? [m] true)
-  
+
   RealVector
   (set-1d [v index e] (mp/set-1d! (.copy v) index e))
   (set-2d [v row column e] (mp/set-2d! (.copy v) row column e))
@@ -113,7 +113,7 @@
       (throw (ex-info "Unable to set row" {}))))
   (set-2d! [m row column e] (doto m (.setEntry row column e)))
   (set-nd! [m indexes e])
-  
+
   RealVector
   (set-1d! [v index e] (doto v (.setEntry index e)))
   (set-2d! [v row column e] (mp/set-nd! v [row column] e))
