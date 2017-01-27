@@ -4,7 +4,12 @@
   (:import [org.apache.commons.math3.linear
             Array2DRowRealMatrix RealMatrix
             ArrayRealVector RealVector
-            RealMatrixChangingVisitor]))
+            RealMatrixChangingVisitor
+            MatrixUtils
+            SparseRealVector
+            SparseRealMatrix
+            OpenMapRealVector
+            OpenMapRealMatrix]))
 
 (extend-protocol mp/PImplementation
   RealMatrix
@@ -222,4 +227,32 @@
       (let [[a b] (mp/broadcast-compatible a b)]
         (mp/element-map a clojure.core/* b)))))
 
+(extend-protocol mp/PMatrixOps
+  RealMatrix
+  (trace [m]
+    (.getTrace m))
+  (determinant [m]
+    (.getDeterminant (LUDecomposition. m)))
+  (inverse [m]
+    (MatrixUtils/inverse m)))
+
+(extend-protocol mp/PSparseArray
+  RealMatrix
+  (is-sparse? [m]
+    (instance? SparseRealMatrix m)))
+
+(defn- make-sparse-array [shape]
+  (let [[rows cols] shape]
+    (case (count shape)
+      1 (OpenMapRealVector. rows)
+      2 (OpenMapRealMatrix. rows cols)
+      :else (throw (ex-info "only 1- or 2-dim arrays supported" {})))))
+
+(extend-protocol mp/PNewSparseArray
+  RealMatrix
+  (new-sparse-array [m shape]
+    (make-sparse-array shape))
+  RealVector
+  (new-sparse-array [m shape]
+    (make-sparse-array shape)))
 (imp/register-implementation (Array2DRowRealMatrix. 1 1))
