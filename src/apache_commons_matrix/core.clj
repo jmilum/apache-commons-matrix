@@ -9,7 +9,14 @@
             SparseRealVector
             SparseRealMatrix
             OpenMapRealVector
-            OpenMapRealMatrix]))
+            OpenMapRealMatrix
+            CholeskyDecomposition
+            EigenDecomposition
+            LUDecomposition
+            QRDecomposition
+            SingularValueDecomposition]
+           [org.apache.commons.math3.stat.regression
+            OLSMultipleLinearRegression]))
 
 (extend-protocol mp/PImplementation
   RealMatrix
@@ -255,4 +262,59 @@
   RealVector
   (new-sparse-array [m shape]
     (make-sparse-array shape)))
+
+(defn- ->array2d [m]
+  (into-array (map mp/to-double-array (mp/get-major-slice-seq m))))
+
+(extend-protocol mp/PSolveLinear
+  RealMatrix
+  (solve [a b]
+    (-> a LUDecomposition. .getSolver .solve b)))
+
+(extend-protocol mp/PLeastSquares
+  RealMatrix
+  (least-squares [a b]
+    (let [regr (OLSMultipleLinearRegression.)]
+      (.newSampleData regr (mp/to-double-array b) (->array2d a))
+      (.calculateHat regr))))
+
+(extend-protocol mp/PSVDDecomposition
+  RealMatrix
+  (svd [m options]
+    (let [solver (SingularValueDecomposition. m)]
+      {:rank (.getRank solver)
+       :S (.getSingularValues solver)
+       ;; left singular vectors
+       :U (.getU solver)
+       ;; (transposed) right singular vectors
+       :V* (.getVT solver)})))
+
+(extend-protocol mp/PLUDecomposition
+  RealMatrix
+  (lu [m options]
+    (let [solver (LUDecomposition. m)]
+      {:l (.getL solver)
+       :u (.getU solver)})))
+
+(extend-protocol mp/PCholeskyDecomposition
+  RealMatrix
+  (cholesky [m options]
+    (.getL (CholeskyDecomposition. m))))
+
+(extend-protocol mp/PQRDecomposition
+  RealMatrix
+  (qr [m options]
+    (let [solver (QRDecomposition. m)]
+      {:q (.getQ solver)
+       :r (.getR solver)})))
+
+(extend-protocol mp/PEigenDecomposition
+  RealMatrix
+  (eigen [m options]
+    (let [solver (EigenDecomposition. m)]
+      ;; real part of eigen-values
+      {:w (.getRealEigenvalues solver)
+       ;; eigen-vectors
+       :v (.getV solver)})))
+
 (imp/register-implementation (Array2DRowRealMatrix. 1 1))
