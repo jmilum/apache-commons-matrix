@@ -312,9 +312,8 @@
   RealMatrix
   (eigen [m options]
     (let [solver (EigenDecomposition. m)]
-      ;; real part of eigen-values
-      {:w (.getRealEigenvalues solver)
-       ;; eigen-vectors
-       :v (.getV solver)})))
+      {:rA (.getRealEigenvalues solver)
+       :iA (.getImagEigenvalues solver)
+       :Q (.getV solver)})))
 
 (imp/register-implementation (Array2DRowRealMatrix. 1 1))
