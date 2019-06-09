@@ -316,4 +316,10 @@
        :iA (.getImagEigenvalues solver)
        :Q (.getV solver)})))
 
+(extend-protocol mp/PMatrixRank
+  RealMatrix
+  (rank [m]
+    (let [solver (SingularValueDecomposition. m)]
+      (.getRank solver))))
+
 (imp/register-implementation (Array2DRowRealMatrix. 1 1))
