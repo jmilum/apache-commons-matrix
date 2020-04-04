@@ -20,41 +20,41 @@
 
 (extend-protocol mp/PImplementation
   RealMatrix
-    (implementation-key [m] :apache-commons)
-    (new-vector [m length] (ArrayRealVector. length))
-    (new-matrix [m rows columns] (Array2DRowRealMatrix. rows columns))
-    (new-matrix-nd [m dims]
-      (case (count dims)
-            0 0.0
-            1 (ArrayRealVector. (first dims))
-            2 (Array2DRowRealMatrix. (first dims) (second dims))
-            (throw (ex-info "Apache Commons Math matrices only supports up to 2 dimensions"
-                            {:requested-shape dims}))))
-    (construct-matrix [m data]
-      (case (mp/dimensionality data)
-            0 data
-            1 (ArrayRealVector. ^doubles (mp/to-double-array data))
-            2 (Array2DRowRealMatrix. (into-array (map mp/to-double-array (mp/get-major-slice-seq data))))))
-    (supports-dimensionality? [m dims] (<= 1 dims 2)))
+  (implementation-key [m] :apache-commons)
+  (new-vector [m length] (ArrayRealVector. length))
+  (new-matrix [m rows columns] (Array2DRowRealMatrix. rows columns))
+  (new-matrix-nd [m dims]
+    (case (count dims)
+      0 0.0
+      1 (ArrayRealVector. (first dims))
+      2 (Array2DRowRealMatrix. (first dims) (second dims))
+      (throw (ex-info "Apache Commons Math matrices only supports up to 2 dimensions"
+                      {:requested-shape dims}))))
+  (construct-matrix [m data]
+    (case (mp/dimensionality data)
+      0 data
+      1 (ArrayRealVector. ^doubles (mp/to-double-array data))
+      2 (Array2DRowRealMatrix. (into-array (map mp/to-double-array (mp/get-major-slice-seq data))))))
+  (supports-dimensionality? [m dims] (<= 1 dims 2)))
 
 (extend-protocol mp/PImplementation
   RealVector
-    (implementation-key [m] :apache-commons)
-    (new-vector [m length] (ArrayRealVector. length))
-    (new-matrix [m rows columns] (Array2DRowRealMatrix. rows columns))
-    (new-matrix-nd [m dims]
-      (case (count dims)
-            0 0.0
-            1 (ArrayRealVector. (first dims))
-            2 (Array2DRowRealMatrix. (first dims) (second dims))
-            (throw (ex-info "Apache Commons Math matrices only supports up to 2 dimensions"
-                            {:requested-shape dims}))))
-    (construct-matrix [m data]
-      (case (mp/dimensionality data)
-            0 data
-            1 (ArrayRealVector. ^doubles (mp/to-double-array data))
-            2 (Array2DRowRealMatrix. (into-array (map mp/to-double-array (mp/get-major-slice-seq data))))))
-    (supports-dimensionality? [m dims] (<= 1 dims 2)))
+  (implementation-key [m] :apache-commons)
+  (new-vector [m length] (ArrayRealVector. length))
+  (new-matrix [m rows columns] (Array2DRowRealMatrix. rows columns))
+  (new-matrix-nd [m dims]
+    (case (count dims)
+      0 0.0
+      1 (ArrayRealVector. (first dims))
+      2 (Array2DRowRealMatrix. (first dims) (second dims))
+      (throw (ex-info "Apache Commons Math matrices only supports up to 2 dimensions"
+                      {:requested-shape dims}))))
+  (construct-matrix [m data]
+    (case (mp/dimensionality data)
+      0 data
+      1 (ArrayRealVector. ^doubles (mp/to-double-array data))
+      2 (Array2DRowRealMatrix. (into-array (map mp/to-double-array (mp/get-major-slice-seq data))))))
+  (supports-dimensionality? [m dims] (<= 1 dims 2)))
 
 (extend-protocol mp/PDimensionInfo
   RealMatrix
@@ -64,10 +64,10 @@
   (is-vector? [m] false)
   (dimension-count [m dimension-number]
     (case dimension-number
-          0 (.getRowDimension m)
-          1 (.getColumnDimension m)
-          (throw (ex-info "RealMatrix only has 2 dimensions"
-                          {:requested-dimension dimension-number}))))
+      0 (.getRowDimension m)
+      1 (.getColumnDimension m)
+      (throw (ex-info "RealMatrix only has 2 dimensions"
+                      {:requested-dimension dimension-number}))))
 
   RealVector
   (dimensionality [v] 1)
@@ -86,11 +86,11 @@
   (get-2d [m row column] (.getEntry m row column))
   (get-nd [m indexes]
     (case (count indexes)
-          1 (mp/get-1d m (first indexes))
-          2 (mp/get-2d m (first indexes) (second indexes))
-          (throw (ex-info "RealMatrix only has 2 dimensions"
-                    {:requested-index indexes
-                     :index-count (count indexes)}))))
+      1 (mp/get-1d m (first indexes))
+      2 (mp/get-2d m (first indexes) (second indexes))
+      (throw (ex-info "RealMatrix only has 2 dimensions"
+                      {:requested-index indexes
+                       :index-count     (count indexes)}))))
 
   RealVector
   (get-1d [v index] (.getEntry v index))
@@ -102,7 +102,7 @@
       (mp/get-1d v (first indexes))
       (throw (ex-info "RealVector only has 1 dimension"
                       {:requested-index indexes
-                       :index-count (count indexes)})))))
+                       :index-count     (count indexes)})))))
 
 (extend-protocol mp/PIndexedSetting
   RealMatrix
@@ -134,7 +134,7 @@
       (mp/set-1d! v (first indexes) e)
       (throw (ex-info "RealVector only has 1 dimension"
                       {:requested-index indexes
-                       :index-count (count indexes)})))))
+                       :index-count     (count indexes)})))))
 
 (extend-protocol mp/PMatrixCloning
   RealMatrix
@@ -206,12 +206,12 @@
   (matrix-multiply [a b]
     (let [b-dims (mp/dimensionality b)]
       (cond
-       (== b-dims 0) (mp/scale a b)
-       (== b-dims 1) (mp/vector-dot a b)
-       (== b-dims 2) (let [[a-rows a-cols] (mp/get-shape a)
-                          a-mat (mp/reshape a [1 a-rows])
-                          prod (mp/matrix-multiply a-mat b)]
-                      (.getRowVector prod 0)))))
+        (== b-dims 0) (mp/scale a b)
+        (== b-dims 1) (mp/vector-dot a b)
+        (== b-dims 2) (let [[a-rows a-cols] (mp/get-shape a)
+                            a-mat (mp/reshape a [1 a-rows])
+                            prod  (mp/matrix-multiply a-mat b)]
+                        (.getRowVector prod 0)))))
   (element-multiply [a b]
     (if (number? b)
       (mp/scale a b)
@@ -222,12 +222,12 @@
   (matrix-multiply [a b]
     (let [b-dims (mp/dimensionality b)]
       (cond
-       (== b-dims 0) (mp/scale a b)
-       (== b-dims 1) (let [[b-len] (mp/get-shape b)
-                          b-mat (mp/reshape a [b-len 1])
-                          prod (mp/matrix-multiply a b-mat)]
-                       (.getColumnVector prod 0))
-       (== b-dims 2) (.multiply a b))))
+        (== b-dims 0) (mp/scale a b)
+        (== b-dims 1) (let [[b-len] (mp/get-shape b)
+                            b-mat (mp/reshape a [b-len 1])
+                            prod  (mp/matrix-multiply a b-mat)]
+                        (.getColumnVector prod 0))
+        (== b-dims 2) (.multiply a b))))
   (element-multiply [a b]
     (if (number? b)
       (mp/scale a b)
@@ -269,7 +269,7 @@
 (extend-protocol mp/PSolveLinear
   RealMatrix
   (solve [a b]
-    (-> a LUDecomposition. .getSolver .solve b)))
+    (-> a (LUDecomposition.) (.getSolver) (.solve b))))
 
 (extend-protocol mp/PLeastSquares
   RealMatrix
@@ -283,11 +283,11 @@
   (svd [m options]
     (let [solver (SingularValueDecomposition. m)]
       {:rank (.getRank solver)
-       :S (.getSingularValues solver)
+       :S    (.getSingularValues solver)
        ;; left singular vectors
-       :U (.getU solver)
+       :U    (.getU solver)
        ;; (transposed) right singular vectors
-       :V* (.getVT solver)})))
+       :V*   (.getVT solver)})))
 
 (extend-protocol mp/PLUDecomposition
   RealMatrix
@@ -314,7 +314,7 @@
     (let [solver (EigenDecomposition. m)]
       {:rA (.getRealEigenvalues solver)
        :iA (.getImagEigenvalues solver)
-       :Q (.getV solver)})))
+       :Q  (.getV solver)})))
 
 (extend-protocol mp/PMatrixRank
   RealMatrix
